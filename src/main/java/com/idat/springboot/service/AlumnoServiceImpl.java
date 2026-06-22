@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import com.idat.springboot.model.Alumno;
 import com.idat.springboot.dto.AlumnoRequest;
 import com.idat.springboot.repository.AlumnoRepository;
+import com.idat.springboot.exception.AlumnoNotFoundException;
 import java.util.List;
 
 @Service
@@ -22,7 +23,11 @@ public class AlumnoServiceImpl implements AlumnoService {
 
     @Override
     public Alumno getAlumnoById(Long id) {
-        return alumnoRepository.findById(id);
+        return alumnoRepository.findAll()
+                .stream()
+                .filter(alumno -> alumno.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new AlumnoNotFoundException(id));
     }
 
     @Override

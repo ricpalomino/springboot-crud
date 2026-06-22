@@ -1,6 +1,10 @@
 package com.idat.springboot.controller;
 
 import com.idat.springboot.service.AlumnoService;
+import com.idat.springboot.common.ApiResponseUtil;
+import com.idat.springboot.common.ApiResponse;
+import jakarta.validation.Valid;
+
 import com.idat.springboot.model.Alumno;
 import com.idat.springboot.dto.AlumnoRequest;
 import java.util.List;
@@ -27,38 +31,33 @@ public class AlumnoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Alumno>> getAlumnos() {
-        return ResponseEntity.ok(alumnoService.getAllAlumnos());
+    public ResponseEntity<ApiResponse<List<Alumno>>> getAlumnos() {
+        return ResponseEntity.ok(ApiResponseUtil.success("Alumnos encontrados", alumnoService.getAllAlumnos()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Alumno> getAlumnoById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Alumno>> getAlumnoById(@PathVariable Long id) {
         Alumno alumno = alumnoService.getAlumnoById(id);
-        if (alumno == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(alumno);
+        return ResponseEntity.ok(ApiResponseUtil.success("Alumno encontrado", alumno));
     }
 
     @PostMapping
-    public ResponseEntity<Alumno> crearAlumno(@RequestBody AlumnoRequest request) {
+    public ResponseEntity<ApiResponse<Alumno>> crearAlumno(@Valid @RequestBody AlumnoRequest request) {
         Alumno alumno = alumnoService.createAlumno(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(alumno);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+            ApiResponseUtil.success("Alumno creado", alumno));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Alumno> actualizarAlumno(@PathVariable Long id, @RequestBody AlumnoRequest request) {
+    public ResponseEntity<ApiResponse<Alumno>> actualizarAlumno(@PathVariable Long id, @Valid @RequestBody AlumnoRequest request) {
         Alumno alumno = alumnoService.updateAlumno(id, request);
-        if (alumno == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(alumno);
+        return ResponseEntity.ok(ApiResponseUtil.success("Alumno actualizado", alumno));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarAlumno(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> eliminarAlumno(@PathVariable Long id) {
         alumnoService.deleteAlumno(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponseUtil.success("Alumno eliminado", null));
     }
 
 }
