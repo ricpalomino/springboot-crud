@@ -1,9 +1,15 @@
 package com.idat.springboot.common;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "Respuesta Standard de la API")
 public class ApiResponse<T> {
 
+    @Schema(description = "Código de respuesta de la API", example = "SUCCESS")
     private String responseCode;
+    @Schema(description = "Mensaje de respuesta de la API", example = "Operación realizada exitosamente")
     private String responseMessage;
+    @Schema(description = "Datos de la respuesta")
     private T data;
     
 

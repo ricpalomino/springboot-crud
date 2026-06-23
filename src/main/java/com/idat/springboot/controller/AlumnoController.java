@@ -1,6 +1,11 @@
 package com.idat.springboot.controller;
 
 import com.idat.springboot.service.AlumnoService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import com.idat.springboot.common.ApiResponseUtil;
 import com.idat.springboot.common.ApiResponse;
 import jakarta.validation.Valid;
@@ -20,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
+@Tag(name = "Alumno Controller", description = "API para gestionar alumnos")
 @RestController
 @RequestMapping("/alumnos")
 public class AlumnoController {
@@ -30,17 +36,24 @@ public class AlumnoController {
         this.alumnoService = alumnoService;
     }
 
+    @Operation(summary = "Obtener todos los alumnos", description = "Devuelve una lista de todos los alumnos registrados")
     @GetMapping
     public ResponseEntity<ApiResponse<List<Alumno>>> getAlumnos() {
         return ResponseEntity.ok(ApiResponseUtil.success("Alumnos encontrados", alumnoService.getAllAlumnos()));
     }
 
+    @Operation(summary = "Obtener un alumno por ID", description = "Devuelve un alumno específico según su ID")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Alumno>> getAlumnoById(@PathVariable Long id) {
         Alumno alumno = alumnoService.getAlumnoById(id);
         return ResponseEntity.ok(ApiResponseUtil.success("Alumno encontrado", alumno));
     }
 
+    @Operation(summary = "Crear un nuevo alumno", description = "Crea un nuevo alumno con los datos proporcionados")
+    @ApiResponses(value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Alumno creado exitosamente"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Error de validación de los datos del alumno")
+    })
     @PostMapping
     public ResponseEntity<ApiResponse<Alumno>> crearAlumno(@Valid @RequestBody AlumnoRequest request) {
         Alumno alumno = alumnoService.createAlumno(request);
@@ -48,12 +61,14 @@ public class AlumnoController {
             ApiResponseUtil.success("Alumno creado", alumno));
     }
 
+    @Operation(summary = "Actualizar un alumno", description = "Actualiza los datos de un alumno existente")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Alumno>> actualizarAlumno(@PathVariable Long id, @Valid @RequestBody AlumnoRequest request) {
         Alumno alumno = alumnoService.updateAlumno(id, request);
         return ResponseEntity.ok(ApiResponseUtil.success("Alumno actualizado", alumno));
     }
 
+    @Operation(summary = "Eliminar un alumno", description = "Elimina un alumno específico según su ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> eliminarAlumno(@PathVariable Long id) {
         alumnoService.deleteAlumno(id);
