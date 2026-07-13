@@ -22,6 +22,8 @@ public class AlumnoRequest {
     @Email(message = "El email debe ser válido")
     private String email;
 
+    private Boolean activo;
+
     public String getNombre() {
         return nombre;
     }
@@ -44,6 +46,14 @@ public class AlumnoRequest {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 
 }

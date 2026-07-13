@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.idat.springboot.model.Alumno;
 import com.idat.springboot.dto.AlumnoRequest;
-import com.idat.springboot.repository.AlumnoRepository;
+import com.idat.springboot.repository.AlumnoJPA;
 import com.idat.springboot.exception.AlumnoNotFoundException;
 import java.util.List;
 
@@ -13,9 +13,9 @@ import java.util.List;
 public class AlumnoServiceImpl implements AlumnoService {
 
     private static final Logger logger = LoggerFactory.getLogger(AlumnoServiceImpl.class);
-    private final AlumnoRepository alumnoRepository;
+    private final AlumnoJPA alumnoRepository;
 
-    public AlumnoServiceImpl(AlumnoRepository alumnoRepository) {
+    public AlumnoServiceImpl(AlumnoJPA alumnoRepository) {
         this.alumnoRepository = alumnoRepository;
     }
 
@@ -28,23 +28,18 @@ public class AlumnoServiceImpl implements AlumnoService {
     @Override
     public Alumno getAlumnoById(Long id) {
         logger.info("obteniendo alumno por ID: {}", id);
-        return alumnoRepository.findAll()
-                .stream()
-                .filter(alumno -> alumno.getId().equals(id))
-                .findFirst()
+        return alumnoRepository.findById(id)
                 .orElseThrow(() -> new AlumnoNotFoundException(id));
     }
 
     @Override
     public Alumno createAlumno(AlumnoRequest alumnoRequest) {
         logger.info("creando nuevo alumno: {}", alumnoRequest.getNombre());
-        Long newId = alumnoRepository.findAll().stream()
-                .mapToLong(Alumno::getId)
-                .max()
-                .orElse(0L) + 1;
-        Alumno alumno = new Alumno(newId, alumnoRequest.getNombre(), alumnoRequest.getEdad());
-        alumnoRepository.findAll().add(alumno);
-        return alumno;
+        Alumno alumno = new Alumno();
+        alumno.setNombre(alumnoRequest.getNombre());
+        alumno.setEdad(alumnoRequest.getEdad());
+        alumno.setEmail(alumnoRequest.getEmail());
+        return alumnoRepository.save(alumno);
     }
 
     @Override
@@ -55,15 +50,15 @@ public class AlumnoServiceImpl implements AlumnoService {
         }
         alumno.setNombre(alumnoRequest.getNombre());
         alumno.setEdad(alumnoRequest.getEdad());
-        alumnoRepository.findAll().remove(alumno);
-        alumnoRepository.findAll().add(alumno);
+        alumno.setEmail(alumnoRequest.getEmail());
+        alumno.setActivo(alumnoRequest.getActivo());
+        alumnoRepository.save(alumno);
         return alumno;
     }
 
     @Override
     public void deleteAlumno(Long id) {
-        alumnoRepository.findAll()
-                .removeIf(alumno -> alumno.getId().equals(id));
+        alumnoRepository.deleteById(id);
     }
 
 }
