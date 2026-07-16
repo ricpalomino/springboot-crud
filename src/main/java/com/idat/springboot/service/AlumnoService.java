@@ -8,6 +8,8 @@ public interface AlumnoService {
 
     List<Alumno> getAllAlumnos();
 
+    List<Alumno> filter(String nombre);
+
     Alumno getAlumnoById(Long id);
 
     Alumno createAlumno(AlumnoRequest alumno);

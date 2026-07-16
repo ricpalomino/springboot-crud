@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,6 +41,13 @@ public class AlumnoController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<Alumno>>> getAlumnos() {
         return ResponseEntity.ok(ApiResponseUtil.success("Alumnos encontrados", alumnoService.getAllAlumnos()));
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<ApiResponse<List<Alumno>>> filter(
+        @RequestParam(required = false) String nombre) {
+        List<Alumno> alumnos = alumnoService.filter(nombre);
+        return ResponseEntity.ok(ApiResponseUtil.success("Alumnos encontrados", alumnos));
     }
 
     @Operation(summary = "Obtener un alumno por ID", description = "Devuelve un alumno específico según su ID")

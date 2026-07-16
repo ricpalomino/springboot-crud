@@ -8,6 +8,7 @@ import com.idat.springboot.dto.AlumnoRequest;
 import com.idat.springboot.repository.AlumnoJPA;
 import com.idat.springboot.exception.AlumnoNotFoundException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AlumnoServiceImpl implements AlumnoService {
@@ -54,6 +55,16 @@ public class AlumnoServiceImpl implements AlumnoService {
         alumno.setActivo(alumnoRequest.getActivo());
         alumnoRepository.save(alumno);
         return alumno;
+    }
+
+    @Override
+    public List<Alumno> filter(String nombre) {
+        logger.info("filtrando alumnos por criterio: {}", nombre);
+        if (nombre == null || nombre.trim().isEmpty()) {
+            return getAllAlumnos();
+        }
+        //return alumnoRepository.findByNombreContainingIgnoreCase(nombre);
+        return alumnoRepository.buscar(nombre, null, null, null, null);
     }
 
     @Override
