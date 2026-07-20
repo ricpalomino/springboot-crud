@@ -8,11 +8,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import com.idat.springboot.common.ApiResponseUtil;
 import com.idat.springboot.common.ApiResponse;
+import com.idat.springboot.dto.PageResponse;
 import jakarta.validation.Valid;
 
 import com.idat.springboot.model.Alumno;
 import com.idat.springboot.dto.AlumnoRequest;
-import java.util.List;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,14 +42,33 @@ public class AlumnoController {
 
     @Operation(summary = "Obtener todos los alumnos", description = "Devuelve una lista de todos los alumnos registrados")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Alumno>>> getAlumnos() {
-        return ResponseEntity.ok(ApiResponseUtil.success("Alumnos encontrados", alumnoService.getAllAlumnos()));
+    public ResponseEntity<ApiResponse<PageResponse<Alumno>>> getAlumnos(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "nombre") String sortBy,
+        @RequestParam(defaultValue = "asc") String sortDir
+    ) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        PageResponse<Alumno> alumnosPage = alumnoService.getAllAlumnos(pageable);
+        return ResponseEntity.ok(ApiResponseUtil.success("Alumnos encontrados", alumnosPage));
     }
 
+    @Operation(summary = "Filtrar alumnos", description = "Filtra alumnos por nombre, email, estado activo y rango de edad")
     @GetMapping("/filter")
-    public ResponseEntity<ApiResponse<List<Alumno>>> filter(
-        @RequestParam(required = false) String nombre) {
-        List<Alumno> alumnos = alumnoService.filter(nombre);
+    public ResponseEntity<ApiResponse<PageResponse<Alumno>>> filter(
+        @RequestParam(required = false) String nombre,
+        @RequestParam(required = false) String email,
+        @RequestParam(required = false) Boolean activo,
+        @RequestParam(required = false) Integer edadMin,
+        @RequestParam(required = false) Integer edadMax,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "nombre") String sortBy,
+        @RequestParam(defaultValue = "asc") String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        PageResponse<Alumno> alumnos = alumnoService.filter(nombre, email, activo, edadMin, edadMax, pageable);
         return ResponseEntity.ok(ApiResponseUtil.success("Alumnos encontrados", alumnos));
     }
 

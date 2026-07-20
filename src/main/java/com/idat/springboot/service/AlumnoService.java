@@ -1,14 +1,15 @@
 package com.idat.springboot.service;
 
-import java.util.List;
+import org.springframework.data.domain.Pageable;
+import com.idat.springboot.dto.PageResponse;
 import com.idat.springboot.model.Alumno;
 import com.idat.springboot.dto.AlumnoRequest;
 
 public interface AlumnoService {
 
-    List<Alumno> getAllAlumnos();
+    PageResponse<Alumno> getAllAlumnos(Pageable pageable);
 
-    List<Alumno> filter(String nombre);
+    PageResponse<Alumno> filter(String nombre, String email, Boolean activo, Integer edadMin, Integer edadMax, Pageable pageable);
 
     Alumno getAlumnoById(Long id);
 

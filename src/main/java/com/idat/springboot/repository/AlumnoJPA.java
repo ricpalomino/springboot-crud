@@ -3,13 +3,16 @@ package com.idat.springboot.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.Query;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import com.idat.springboot.model.Alumno;
 
 public interface AlumnoJPA extends JpaRepository<Alumno, Long> {
 
     List<Alumno> findByNombreContainingIgnoreCase(String nombre);
+
+    Page<Alumno> findByNombreContainingIgnoreCase(String nombre, Pageable pageable);
 
     List<Alumno> findByEmailContainingIgnoreCase(String email);
 
@@ -31,5 +34,5 @@ public interface AlumnoJPA extends JpaRepository<Alumno, Long> {
             "(:activo IS NULL OR a.activo = :activo) AND " +
             "(:edadMin IS NULL OR a.edad >= :edadMin) AND " +
             "(:edadMax IS NULL OR a.edad <= :edadMax)")
-    List<Alumno> buscar(@Param("nombre") String nombre, @Param("email") String email, @Param("activo") Boolean activo, @Param("edadMin") Integer edadMin, @Param("edadMax") Integer edadMax);
+    Page<Alumno> buscar(@Param("nombre") String nombre, @Param("email") String email, @Param("activo") Boolean activo, @Param("edadMin") Integer edadMin, @Param("edadMax") Integer edadMax, Pageable pageable);
 }

@@ -3,12 +3,13 @@ package com.idat.springboot.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import com.idat.springboot.model.Alumno;
 import com.idat.springboot.dto.AlumnoRequest;
+import com.idat.springboot.dto.PageResponse;
 import com.idat.springboot.repository.AlumnoJPA;
 import com.idat.springboot.exception.AlumnoNotFoundException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class AlumnoServiceImpl implements AlumnoService {
@@ -21,9 +22,17 @@ public class AlumnoServiceImpl implements AlumnoService {
     }
 
     @Override
-    public List<Alumno> getAllAlumnos() {
+    public PageResponse<Alumno> getAllAlumnos(Pageable pageable) {
         logger.info("obteniendo todos los alumnos");
-        return alumnoRepository.findAll();
+        Page<Alumno> page = alumnoRepository.findAll(pageable);
+        return new PageResponse<>(
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isLast(),
+                page.getContent()
+        );
     }
 
     @Override
@@ -58,13 +67,18 @@ public class AlumnoServiceImpl implements AlumnoService {
     }
 
     @Override
-    public List<Alumno> filter(String nombre) {
-        logger.info("filtrando alumnos por criterio: {}", nombre);
-        if (nombre == null || nombre.trim().isEmpty()) {
-            return getAllAlumnos();
-        }
-        //return alumnoRepository.findByNombreContainingIgnoreCase(nombre);
-        return alumnoRepository.buscar(nombre, null, null, null, null);
+    public PageResponse<Alumno> filter(String nombre, String email, Boolean activo, Integer edadMin, Integer edadMax, Pageable pageable) {
+        logger.info("filtrando alumnos por criterios - nombre: {}, email: {}, activo: {}, edadMin: {}, edadMax: {}",
+                nombre, email, activo, edadMin, edadMax);
+        Page<Alumno> page = alumnoRepository.buscar(nombre, email, activo, edadMin, edadMax, pageable);
+        return new PageResponse<>(
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isLast(),
+                page.getContent()
+        );
     }
 
     @Override
